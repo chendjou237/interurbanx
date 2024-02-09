@@ -1,32 +1,20 @@
 'use client'
 
-import React from 'react'
+import React, { useContext } from 'react'
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import PocketBase from "pocketbase";
+
 import { useRouter } from 'next/navigation';
+import { signup } from '../libs/auth';
+import { PocketBaseContext } from '../libs/context';
 
 export default function SignupForm() {
+  const {client} = useContext(PocketBaseContext)
     const signupClient = async (firstName: string, lastName: string, email: string, username: string, password: string, passwordConfirm: string) => {
-      const pb = new PocketBase("http://127.0.0.1:8090")
       try {
-        const data = {
-          "username": username,
-          "name": firstName+lastName,
-          "email":email,
-          "emailVisibility": true,
-          "password": password,
-          "passwordConfirm":passwordConfirm
-        }
-        const record = await pb.collection('users').create(data)
-        console.log(record);
-        
-        const authData = await pb.collection('users').authWithPassword(
-          email,
-          password,
-      );
+    const token = await    signup(firstName, lastName, email, username, password, passwordConfirm, client!)
       
-        return authData
-      } catch (error) {
+        return token
+      } catch (error) { 
         console.log(error)
         alert('we encounter an issue when creating your account please contact support')
       }

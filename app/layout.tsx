@@ -4,6 +4,7 @@ import "./globals.css";
 import PrelineScript from "./components/PrelineScript";
 import NavBar from "./NavBar"
 import Footer from "./Footer";
+import { PocketBaseContext, PocketBaseProvider}  from "./libs/context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,9 +21,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <PocketBaseProvider >
+
         <NavBar />
+        <div className="flex flex-col min-h-screen">
+          <div className="mb-auto">
         {children}
+          </div>
         <Footer />
+        </div>
+        </PocketBaseProvider>
+
         </body>
       <PrelineScript />
     </html>

@@ -2,11 +2,17 @@
 import Image from 'next/image'
 import React from 'react'
 import SignupForm from './SignupForm';
+import isAuthenticated from '../utils/isAuthenticated';
+import { redirect } from 'next/navigation';
+import { usePocketbaseContext } from '../libs/context';
 
 
 
 
 export default function SignUpPage() {
+  const client = usePocketbaseContext()
+  if(isAuthenticated(client!))
+  redirect('/shipments')
   const image = "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=320&h=320&q=80";
 
   return (

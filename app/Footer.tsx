@@ -2,8 +2,9 @@
 import React from 'react'
 
 export default function Footer() {
+
   return (
-    <div>
+    <div >
       <footer className="w-full max-w-[85rem] py-10 px-4 sm:px-6 lg:px-8 mx-auto">
   <div className="text-center">
     <div>
