@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import PocketBase from "pocketbase";
+import pb from "../utils/pb";
 
 export function signOut(client: PocketBase) {
   console.log(`the auth validity:  ${client.authStore.token}`);
@@ -15,13 +16,10 @@ export async function signin(
     const data = await client
       .collection("users")
       .authWithPassword(email, password);
-    cookies().set(
-      "pb_auth",
-      client.authStore.exportToCookie({ httpOnly: false })
-    );
+    
 
-    alert(client.authStore.token);
-    return client.authStore.exportToCookie({ httpOnly: false });
+    alert(pb.authStore.token);
+    return pb.authStore.exportToCookie({ httpOnly: false });
   } catch (error) {
     console.log(error);
 
@@ -37,7 +35,7 @@ export async function signup(
   username: string,
   password: string,
   passwordConfirm: string,
-  pb: PocketBase
+  client: PocketBase
 ) {
   const data = {
     username: username,
@@ -47,10 +45,10 @@ export async function signup(
     password: password,
     passwordConfirm: passwordConfirm,
   };
-  const record = await pb.collection("users").create(data);
+  const record = await client.collection("users").create(data);
   console.log(record);
 
-  const authData = await pb
+  const authData = await client
     .collection("users")
     .authWithPassword(email, password);
   return authData.token;

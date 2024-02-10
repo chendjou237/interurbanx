@@ -13,7 +13,6 @@ import PocketBase from 'pocketbase';
 
 export default function SignInPage() {
 const client = new PocketBase("http://127.0.0.1:8090")
-  client.authStore.loadFromCookie(cookies()?.get("pb_auth")?.value ?? "" )
   const auth = isAuthenticated(client)
   if(auth){
       

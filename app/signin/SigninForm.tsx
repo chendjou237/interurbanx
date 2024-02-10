@@ -16,7 +16,6 @@ export default function SigninForm() {
       const onSubmit =async (data:any) => {
         const { email, password } = data;
         const token =await signin(email, password, client!);
-        cookies().set("pb_auth", token!)
         if(token)
           router.push('/profile')
         else 
