@@ -6,6 +6,7 @@ import {  useForm } from "react-hook-form";
 import { signin, signOut } from '../libs/auth';
 import { useContext } from 'react';
 import { PocketBaseContext } from '../libs/context';
+import { cookies } from 'next/headers';
 export default function SigninForm() {
     const router = useRouter()
     const  {client} = useContext(PocketBaseContext)
@@ -15,6 +16,7 @@ export default function SigninForm() {
       const onSubmit =async (data:any) => {
         const { email, password } = data;
         const token =await signin(email, password, client!);
+        cookies().set("pb_auth", token!)
         if(token)
           router.push('/profile')
         else 

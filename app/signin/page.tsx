@@ -7,11 +7,14 @@ import Link from 'next/link'
 import SigninForm from './SigninForm';
 import { redirect } from 'next/navigation';
 import { PocketBaseContext, usePocketbaseContext } from '../libs/context';
+import { cookies } from 'next/headers';
+import PocketBase from 'pocketbase';
 
 
 export default function SignInPage() {
-const {client} = useContext(PocketBaseContext)
-  const auth = isAuthenticated(client!)
+const client = new PocketBase("http://127.0.0.1:8090")
+  client.authStore.loadFromCookie(cookies()?.get("pb_auth")?.value ?? "" )
+  const auth = isAuthenticated(client)
   if(auth){
       
       redirect('/shipments')
