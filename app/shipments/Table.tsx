@@ -1,69 +1,34 @@
-import React from 'react'
+'use client'
+import React, { useEffect, useState } from 'react'
 import { IShipments, ShipmentStatus } from '../utils/types'
+import PocketBase from 'pocketbase'
+import { getClientShipment } from '../libs/shipments'
+import CreateShipmentModal from './CreatShipmentModal'
 
-export default function Table() {
-  const mockData: IShipments[] = [
-    {
-      id: '1',
-      clientId: '1',
-      travelerId: '1',
-      createdAt: null,
-      itemInfo: '1',
-      origin: '1',
-      destination: '1',
-      amount: 100,
-      status: ShipmentStatus.delivered,
-      deliveryDate: '1',
-    },
-    {
-      id: '2',
-      clientId: '2',
-      travelerId: '2',
-      itemInfo: '2',
-      origin: '2',
-      createdAt:null,
-      destination: '2',
-      amount: 200,
-      status: ShipmentStatus.delivered,
-      deliveryDate: '2',
-    },
-    {
-      id: '3',
-      clientId: '3',
-      travelerId: '3',
-      itemInfo: '3',
-      origin: '3',
-      createdAt: null,
-      destination: '3',
-      amount: 300,
-      status: ShipmentStatus.pending,
-      deliveryDate: '3',
-    },
-    {
-      id: '4',
-      clientId: '4',
-      travelerId: '4',
-      itemInfo: '4',
-      origin: '4',
-      createdAt: null,
-      destination: '4',
-      amount: 400,
-      status: ShipmentStatus.pending,
-      deliveryDate: '4',
-    },
-    {
-      id: '5',
-      clientId: '5',
-      travelerId: '5',
-      amount: 500,
-      itemInfo: '5',
-      createdAt: null,
-      origin: '5',
-      destination: '5',
-      status: ShipmentStatus.delivered,
-      deliveryDate: '5',
-    },
-  ]
+type TableProps = {
+  pb: PocketBase
+}
+
+export default  function Table( {pb}: TableProps) {
+  const [shipments, setShipments] = useState<IShipments[]>([])
+  const [isLoading, setLoading] = useState(true)
+  const [selectedShipment, setselectedShipment] = useState<IShipments | null>(null)
+
+ 
+  useEffect(() => {
+    const fetchShipment = async () => {
+      const data = await getClientShipment(pb, pb.authStore.model!.id)
+      
+      setShipments(data)
+      setLoading(false)
+      console.log(data)
+    }
+  
+    fetchShipment()
+  }, [])
+  
+  if(isLoading) return <center>Loading your data...</center>
+ 
   return (
     <div>
 <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
@@ -81,18 +46,7 @@ export default function Table() {
               </p>
             </div>
 
-            <div>
-              <div className="inline-flex gap-x-2">
-                <a className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" href="#">
-                  View all
-                </a>
-
-                <a className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" href="#">
-                  <svg className="flex-shrink-0 w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                  Create
-                </a>
-              </div>
-            </div>
+            <CreateShipmentModal />
           </div>
 
           <div className="border-b border-gray-200 hover:bg-gray-50 dark:hover:bg-slate-900 dark:border-gray-700">
@@ -120,13 +74,13 @@ export default function Table() {
                 <th scope="col" className="px-6 py-3 text-start">
                   <div className="flex items-center gap-x-2">
                     <span className="text-xs font-semibold uppercase tracking-wide text-gray-800 dark:text-gray-200">
-                      Shipment number
+                      Origin
                     </span>
                     <div className="hs-tooltip">
                       <div className="hs-tooltip-toggle">
                         <svg className="flex-shrink-0 w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
                         <span className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm dark:bg-slate-700" role="tooltip">
-                          Shipment number related popup
+                          Where the shipment is coming from
                         </span>
                       </div>
                     </div>
@@ -144,7 +98,7 @@ export default function Table() {
                 <th scope="col" className="px-6 py-3 text-start">
                   <div className="flex items-center gap-x-2">
                     <span className="text-xs font-semibold uppercase tracking-wide text-gray-800 dark:text-gray-200">
-                      Status
+                      Available Space
                     </span>
                   </div>
                 </th>
@@ -152,7 +106,7 @@ export default function Table() {
                 <th scope="col" className="px-6 py-3 text-start">
                   <div className="flex items-center gap-x-2">
                     <span className="text-xs font-semibold uppercase tracking-wide text-gray-800 dark:text-gray-200">
-                      Due
+                      Arrival Date
                     </span>
                   </div>
                 </th>
@@ -170,26 +124,26 @@ export default function Table() {
             </thead>
 
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {mockData.map((shipment) => {
-          const      {id, clientId, travelerId, itemInfo, origin, destination, status, deliveryDate, amount} = shipment
+              {shipments.map((shipment) => {
+          const      {id, client, agent, itemInfo, origin,weight, destination, status, deliveryDate, amount} = shipment
                 return (
                   <tr key={1} className="bg-white hover:bg-gray-50 dark:bg-slate-900 dark:hover:bg-slate-800">
                     <td className="h-px w-px whitespace-nowrap">
-                      <button type="button" className="block" data-hs-overlay="#hs-ai-invoice-modal">
+                      <button type="button" onClick={(e) => setselectedShipment(shipment)} className="block" data-hs-overlay="#hs-ai-invoice-modal">
                         <span className="block px-6 py-2">
-                          <span className="font-mono text-sm text-blue-600 dark:text-blue-500">{id}</span>
+                          <span className="font-mono text-sm text-blue-600 dark:text-blue-500">{origin}</span>
                         </span>
                       </button>
                     </td>
                     <td className="h-px w-px whitespace-nowrap">
-                      <button type="button" className="block" data-hs-overlay="#hs-ai-invoice-modal">
+                      <button type="button" className="block" onClick={(e) => setselectedShipment(shipment)} data-hs-overlay="#hs-ai-invoice-modal">
                         <span className="block px-6 py-2">
                           <span className="text-sm text-gray-600 dark:text-gray-400">{amount}</span>
                         </span>
                       </button>
                     </td>
-                    <td className="h-px w-px whitespace-nowrap">
-                      <button type="button" className="block" data-hs-overlay="#hs-ai-invoice-modal">
+                  {/*   <td className="h-px w-px whitespace-nowrap">
+                      <button type="button" className="block" onClick={(e) => setselectedShipment(shipment)} data-hs-overlay="#hs-ai-invoice-modal">
                         <span className="block px-6 py-2">
                         {status == ShipmentStatus.pending ? (<span className="inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-green-200">
                         <svg className="w-2.5 h-2.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -205,18 +159,25 @@ export default function Table() {
                           </span>)}
                         </span>
                       </button>
+                    </td> */}
+                    <td className="h-px w-px whitespace-nowrap">
+                      <button type="button" onClick={(e) => setselectedShipment(shipment)} className="block" data-hs-overlay="#hs-ai-invoice-modal">
+                        <span className="block px-6 py-2">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{weight} Kg</span>
+                        </span>
+                      </button>
                     </td>
                     <td className="h-px w-px whitespace-nowrap">
-                      <button type="button" className="block" data-hs-overlay="#hs-ai-invoice-modal">
+                      <button type="button" onClick={(e) => setselectedShipment(shipment)} className="block" data-hs-overlay="#hs-ai-invoice-modal">
                         <span className="block px-6 py-2">
                           <span className="text-sm text-gray-600 dark:text-gray-400">{deliveryDate}</span>
                         </span>
                       </button>
                     </td>
                     <td className="h-px w-px whitespace-nowrap">
-                      <button type="button" className="block" data-hs-overlay="#hs-ai-invoice-modal">
+                      <button type="button" className="block" onClick={(e) => setselectedShipment(shipment)} data-hs-overlay="#hs-ai-invoice-modal">
                         <span className="block px-6 py-2">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{origin}</span>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{destination}</span>
                         </span>
                       </button>
                     </td>
@@ -247,7 +208,7 @@ export default function Table() {
           <div className="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-t border-gray-200 dark:border-gray-700">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                <span className="font-semibold text-gray-800 dark:text-gray-200">9</span> results
+                <span className="font-semibold text-gray-800 dark:text-gray-200">{shipments.length}</span> results
               </p>
             </div>
 
@@ -305,22 +266,22 @@ export default function Table() {
       <div className="p-4 sm:p-7 overflow-y-auto">
         <div className="text-center">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-            Invoice from Preline
+            Shipments from InterUrban
           </h3>
           <p className="text-sm text-gray-500">
-            Invoice #3682303
+            Shipment Id {selectedShipment?.id}
           </p>
         </div>
 
         <div className="mt-5 sm:mt-10 grid grid-cols-2 sm:grid-cols-3 gap-5">
           <div>
             <span className="block text-xs uppercase text-gray-500">Amount paid:</span>
-            <span className="block text-sm font-medium text-gray-800 dark:text-gray-200">$316.8</span>
+            <span className="block text-sm font-medium text-gray-800 dark:text-gray-200"> {selectedShipment?.amount}</span>
           </div>
 
           <div>
-            <span className="block text-xs uppercase text-gray-500">Date paid:</span>
-            <span className="block text-sm font-medium text-gray-800 dark:text-gray-200">April 22, 2020</span>
+            <span className="block text-xs uppercase text-gray-500">Status:</span>
+            <span className="block text-sm font-medium text-gray-800 dark:text-gray-200">{selectedShipment?.status}</span>
           </div>
 
           <div>
@@ -338,7 +299,7 @@ export default function Table() {
                 </clipPath>
                 </defs>
               </svg>
-              <span className="block text-sm font-medium text-gray-800 dark:text-gray-200">•••• 4242</span>
+              <span className="block text-sm font-medium text-gray-800 dark:text-gray-200">On delivery</span>
             </div>
           </div>
         </div>
@@ -349,33 +310,51 @@ export default function Table() {
           <ul className="mt-3 flex flex-col">
             <li className="inline-flex items-center gap-x-2 py-3 px-4 text-sm border text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:border-gray-700 dark:text-gray-200">
               <div className="flex items-center justify-between w-full">
-                <span>Payment to Front</span>
-                <span>$264.00</span>
+                <span>Content Info</span>
+                <span>{selectedShipment?.itemInfo}</span>
               </div>
             </li>
             <li className="inline-flex items-center gap-x-2 py-3 px-4 text-sm border text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:border-gray-700 dark:text-gray-200">
               <div className="flex items-center justify-between w-full">
-                <span>Tax fee</span>
-                <span>$52.8</span>
+                <span>traveler name</span>
+                <span>{selectedShipment?.expand?.agent.username}</span>
+              </div>
+            </li>
+            <li className="inline-flex items-center gap-x-2 py-3 px-4 text-sm border text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:border-gray-700 dark:text-gray-200">
+              <div className="flex items-center justify-between w-full">
+                <span>traveler contact</span>
+                <span>{selectedShipment?.expand?.agent.contact}</span>
               </div>
             </li>
             <li className="inline-flex items-center gap-x-2 py-3 px-4 text-sm font-semibold bg-gray-50 border text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-slate-800 dark:border-gray-700 dark:text-gray-200">
               <div className="flex items-center justify-between w-full">
-                <span>Amount paid</span>
-                <span>$316.8</span>
+                <span>Due Date</span>
+                <span>{selectedShipment?.deliveryDate}</span>
+              </div>
+            </li>
+            <li className="inline-flex items-center gap-x-2 py-3 px-4 text-sm font-semibold bg-gray-50 border text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-slate-800 dark:border-gray-700 dark:text-gray-200">
+              <div className="flex items-center justify-between w-full">
+                <span>accepted Date</span>
+                <span>{selectedShipment?.created}</span>
+              </div>
+            </li>
+            <li className="inline-flex items-center gap-x-2 py-3 px-4 text-sm font-semibold bg-gray-50 border text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-slate-800 dark:border-gray-700 dark:text-gray-200">
+              <div className="flex items-center justify-between w-full">
+                <span>Weight of the content</span>
+                <span>{selectedShipment?.weight} Kg</span>
               </div>
             </li>
           </ul>
         </div>
 
         <div className="mt-5 flex justify-end gap-x-2">
-          <a className="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-lg border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm dark:bg-gray-800 dark:hover:bg-slate-800 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:focus:ring-offset-gray-800" href="#">
+         {/*  <a className="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-lg border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm dark:bg-gray-800 dark:hover:bg-slate-800 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:focus:ring-offset-gray-800" href="#">
             <svg className="flex-shrink-0 w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
             Invoice PDF
-          </a>
+          </a> */}
           <a className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" href="#">
             <svg className="flex-shrink-0 w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
-            Print
+            Proceed to payment
           </a>
         </div>
 

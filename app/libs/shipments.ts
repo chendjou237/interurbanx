@@ -1,15 +1,20 @@
 import { IShipments } from "../utils/types";
 import PocketBase from "pocketbase";
+
 export function createShipment(data: IShipments, client: PocketBase) {
   return client.collection("shipments").create(data);
 }
 
-export function getClientShipment(pb: PocketBase, id: string) {
-  return pb.collection("shipments").getFullList({ filter: `client == ${id}` });
+export async function getClientShipment(pb: PocketBase, id: string) {
+  const data = await pb.collection("shipments"). getList<IShipments>(1, 50, {
+    filter: pb.filter( `client = "${id}"`,),
+    expand: 'agent',
+  });
+  return data.items
 }
 
 export function getAgentShipment(pb: PocketBase, id: string) {
-  return pb.collection("shipments").getFullList({ filter: `agent == ${id}` });
+  return pb.collection("shipments").getList(1, 50, { filter: `agent = ${id}` });
 }
 
 export function acceptShipment(id: string, agentId: string, pb: PocketBase) {

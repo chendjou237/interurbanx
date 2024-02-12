@@ -3,13 +3,15 @@ import { createContext, useContext, useEffect, useState } from "react";
 import PocketBase from "pocketbase";
 
 
-export const PocketBaseContext = createContext< {client: PocketBase| null} >({client : new PocketBase("http://127.0.0.1:8090")});
+export const PocketBaseContext = createContext< {client: PocketBase| null} >({client : new PocketBase("http://127.0.0.1:8090").autoCancellation(false)  });
 
 export const PocketBaseProvider = ({ children }:any)  => {
-  const [client, setClient] = useState<PocketBase| null>(new PocketBase("http://127.0.0.1:8090"))
+  const [client, setClient] = useState<PocketBase| null>(new PocketBase("http://127.0.0.1:8090").autoCancellation(false))
   
   useEffect(() => {
-  const updateClient = () =>  setClient(new PocketBase("http://127.0.0.1:8090"))
+  const updateClient = () =>  {
+    return setClient(new PocketBase("http://127.0.0.1:8090").autoCancellation(false));
+  }
   updateClient()
   }
   , [])

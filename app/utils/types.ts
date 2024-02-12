@@ -1,14 +1,22 @@
 export interface IShipments {
   id: string | null;
-  clientId: string;
-  travelerId: string | null;
-  itemInfo: string;
+  client: string | null;
+  agent: string ;
+  itemInfo: string | null;
   origin: string;
   destination: string;
-  status: ShipmentStatus;
+  status: ShipmentStatus ;
   deliveryDate: string;
   amount: number;
-  createdAt: string | null;
+  created: string | null;
+  weight: number;
+  expand: {
+    agent: {
+      contact: number;
+      username: string;
+      email: string;
+    };
+  } | null;
 }
 
 export enum ShipmentStatus {
